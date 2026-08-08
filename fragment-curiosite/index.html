@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+      <!DOCTYPE html>
 <html lang="fr">
 
 <head>
@@ -11,7 +11,7 @@
 
   <meta
     name="theme-color"
-    content="#090604"
+    content="#080604"
   >
 
   <title>Fragment de la Curiosité</title>
@@ -24,55 +24,54 @@
 
 <body>
 
-  <div id="app">
+  <!-- Écran de chargement -->
+  <div id="loading">
 
-    <!-- SCÈNE 3D -->
-    <div id="scene"></div>
+    <div class="loading-symbol">✦</div>
 
-    <!-- TITRE -->
-    <div class="title">
+    <div class="loading-title">
+      LES ARCHIVES DU CODEX
+    </div>
 
-      <div class="title-small">
+    <div class="loading-text">
+      Révélation du Fragment...
+    </div>
+
+  </div>
+
+
+  <!-- Scène Three.js -->
+  <div id="scene"></div>
+
+
+  <!-- Interface -->
+  <div id="interface">
+
+    <header>
+
+      <div class="eyebrow">
         LES ARCHIVES DU CODEX
       </div>
 
-      <div class="title-main">
-        FRAGMENT DE LA<br>
-        CURIOSITÉ
-      </div>
+      <h1>
+        FRAGMENT DE LA
+        <br>
+        <span>CURIOSITÉ</span>
+      </h1>
 
-    </div>
+    </header>
 
-    <!-- INSTRUCTIONS -->
-    <div class="instructions">
-      Fais glisser ton doigt pour observer ·
+
+    <div class="instruction">
+      Fais glisser ton doigt pour observer
+      <span>•</span>
       Pince pour zoomer
     </div>
 
   </div>
 
 
-  <!-- ÉCRAN DE CHARGEMENT -->
-
-  <div id="loading">
-
-    <div class="loading-content">
-
-      <div class="loading-symbol">
-        ✦
-      </div>
-
-      <div class="loading-text">
-        OUVERTURE DES ARCHIVES...
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <!-- MOTEUR THREE.JS -->
-
+  <!-- Moteur Three.js -->
   <script
     type="module"
     src="app.js"
