@@ -1,13 +1,83 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  >
+
+  <meta
+    name="theme-color"
+    content="#090604"
+  >
+
   <title>Fragment de la Curiosité</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
 </head>
 
 <body>
-  <h1>Fragment de la Curiosité</h1>
-  <p>Les archives s'ouvrent...</p>
+
+  <div id="app">
+
+    <!-- SCÈNE 3D -->
+    <div id="scene"></div>
+
+    <!-- TITRE -->
+    <div class="title">
+
+      <div class="title-small">
+        LES ARCHIVES DU CODEX
+      </div>
+
+      <div class="title-main">
+        FRAGMENT DE LA<br>
+        CURIOSITÉ
+      </div>
+
+    </div>
+
+    <!-- INSTRUCTIONS -->
+    <div class="instructions">
+      Fais glisser ton doigt pour observer ·
+      Pince pour zoomer
+    </div>
+
+  </div>
+
+
+  <!-- ÉCRAN DE CHARGEMENT -->
+
+  <div id="loading">
+
+    <div class="loading-content">
+
+      <div class="loading-symbol">
+        ✦
+      </div>
+
+      <div class="loading-text">
+        OUVERTURE DES ARCHIVES...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- MOTEUR THREE.JS -->
+
+  <script
+    type="module"
+    src="app.js"
+  ></script>
+
 </body>
+
 </html>
