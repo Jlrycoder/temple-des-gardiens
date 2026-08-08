@@ -1,33 +1,529 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#120d08">
-<title>Les Archives du Codex — Temple des Gardiens</title>
-<link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Temple des Gardiens — Fragment de la Curiosité</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #080706;
+      color: #e8d3a0;
+      font-family: Georgia, serif;
+    }
+
+    #app {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    #scene {
+      position: absolute;
+      inset: 0;
+    }
+
+    .title {
+      position: absolute;
+      top: 30px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      z-index: 10;
+      pointer-events: none;
+      text-shadow: 0 2px 12px #000;
+    }
+
+    .title small {
+      display: block;
+      font-size: 12px;
+      letter-spacing: 4px;
+      opacity: 0.8;
+      margin-bottom: 8px;
+    }
+
+    .title h1 {
+      font-size: clamp(25px, 7vw, 48px);
+      letter-spacing: 3px;
+      font-weight: normal;
+    }
+
+    .instruction {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      text-align: center;
+      font-size: 13px;
+      opacity: 0.7;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .loading {
+      position: absolute;
+      inset: 0;
+      background: #080706;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      transition: opacity 1s ease;
+    }
+
+    .loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-text {
+      text-align: center;
+      letter-spacing: 3px;
+    }
+
+    .loading-symbol {
+      font-size: 42px;
+      margin-bottom: 15px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 0.35;
+        transform: scale(0.95);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div id="loading" class="screen">
-  <div class="seal">✦</div>
-  <p class="eyebrow">LES ARCHIVES DU CODEX</p>
-  <h1>Temple des Gardiens</h1>
-  <div class="loader"><span id="loaderBar"></span></div>
-  <p id="loadingText">Ouverture des archives…</p>
-</div>
-<main id="main" class="hidden">
-<header class="topbar"><span>LES ARCHIVES DU CODEX</span><span>v0.1</span></header>
-<section class="hero">
-  <div id="scene"></div>
-  <div class="overlay">
-    <p class="eyebrow">ARCHIVE SECRÈTE</p>
-    <h1>Le Temple des<br><em>Gardiens</em></h1>
-    <p>Le moteur des archives est prêt.<br>Le premier fragment pourra bientôt être révélé.</p>
-    <button id="enterButton">Entrer dans les archives</button>
-    <p class="hint">Glisse ton doigt pour observer · Pince pour zoomer</p>
+
+<div id="app">
+
+  <div class="loading" id="loading">
+    <div class="loading-text">
+      <div class="loading-symbol">✦</div>
+      OUVERTURE DES ARCHIVES...
+    </div>
   </div>
-</section>
-</main>
-<script type="module" src="js/app.js"></script>
+
+  <div id="scene"></div>
+
+  <div class="title">
+    <small>LES ARCHIVES DU CODEX</small>
+    <h1>FRAGMENT DE LA CURIOSITÉ</h1>
+  </div>
+
+  <div class="instruction">
+    Fais glisser ton doigt pour observer · Pince pour zoomer
+  </div>
+
+</div>
+
+<script type="module">
+
+  import * as THREE from
+    "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+
+  /* =========================
+     MOTEUR DU TEMPLE
+     ========================= */
+
+  const container = document.getElementById("scene");
+
+  const scene = new THREE.Scene();
+
+  scene.background = new THREE.Color(0x080706);
+
+  /* Caméra */
+
+  const camera = new THREE.PerspectiveCamera(
+    45,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    100
+  );
+
+  camera.position.set(0, 0, 7);
+
+  /* Rendu */
+
+  const renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: false
+  });
+
+  renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio, 2)
+  );
+
+  renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+  );
+
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  container.appendChild(renderer.domElement);
+
+  /* Lumières */
+
+  const ambientLight = new THREE.AmbientLight(
+    0xffdca0,
+    1.8
+  );
+
+  scene.add(ambientLight);
+
+  const light = new THREE.PointLight(
+    0xffc56b,
+    35,
+    20
+  );
+
+  light.position.set(0, 2, 4);
+
+  scene.add(light);
+
+  /* =========================
+     FRAGMENT
+     ========================= */
+
+  const fragment = new THREE.Group();
+
+  scene.add(fragment);
+
+  /* Cercle extérieur */
+
+  const ringGeometry =
+    new THREE.TorusGeometry(
+      2.15,
+      0.08,
+      24,
+      96
+    );
+
+  const goldMaterial =
+    new THREE.MeshStandardMaterial({
+      color: 0x9a6b2f,
+      metalness: 0.8,
+      roughness: 0.35
+    });
+
+  const ring =
+    new THREE.Mesh(
+      ringGeometry,
+      goldMaterial
+    );
+
+  fragment.add(ring);
+
+  /* Cercle intérieur */
+
+  const innerGeometry =
+    new THREE.TorusGeometry(
+      1.75,
+      0.035,
+      20,
+      96
+    );
+
+  const innerRing =
+    new THREE.Mesh(
+      innerGeometry,
+      goldMaterial
+    );
+
+  fragment.add(innerRing);
+
+  /* Œil */
+
+  const eyeGeometry =
+    new THREE.SphereGeometry(
+      0.75,
+      48,
+      32
+    );
+
+  const eyeMaterial =
+    new THREE.MeshStandardMaterial({
+      color: 0xc7a56b,
+      roughness: 0.5,
+      metalness: 0.15
+    });
+
+  const eye =
+    new THREE.Mesh(
+      eyeGeometry,
+      eyeMaterial
+    );
+
+  eye.scale.set(
+    1.45,
+    0.55,
+    0.35
+  );
+
+  eye.position.z = 0.15;
+
+  fragment.add(eye);
+
+  /* Pupille */
+
+  const pupilGeometry =
+    new THREE.SphereGeometry(
+      0.28,
+      32,
+      24
+    );
+
+  const pupilMaterial =
+    new THREE.MeshStandardMaterial({
+      color: 0x050403,
+      roughness: 0.15,
+      metalness: 0.2
+    });
+
+  const pupil =
+    new THREE.Mesh(
+      pupilGeometry,
+      pupilMaterial
+    );
+
+  pupil.scale.set(
+    1,
+    1,
+    0.45
+  );
+
+  pupil.position.set(
+    0,
+    0,
+    0.5
+  );
+
+  fragment.add(pupil);
+
+  /* Rayons autour de l'œil */
+
+  const rays = new THREE.Group();
+
+  for (let i = 0; i < 32; i++) {
+
+    const angle =
+      (i / 32) * Math.PI * 2;
+
+    const geometry =
+      new THREE.BufferGeometry();
+
+    const positions = new Float32Array([
+      Math.cos(angle) * 0.95,
+      Math.sin(angle) * 0.95,
+      0,
+
+      Math.cos(angle) * 1.35,
+      Math.sin(angle) * 1.35,
+      0
+    ]);
+
+    geometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(
+        positions,
+        3
+      )
+    );
+
+    const material =
+      new THREE.LineBasicMaterial({
+        color: 0xa77b3d,
+        transparent: true,
+        opacity: 0.7
+      });
+
+    const line =
+      new THREE.Line(
+        geometry,
+        material
+      );
+
+    rays.add(line);
+  }
+
+  fragment.add(rays);
+
+  /* =========================
+     INTERACTION
+     ========================= */
+
+  let targetRotationX = 0;
+  let targetRotationY = 0;
+
+  let currentRotationX = 0;
+  let currentRotationY = 0;
+
+  let startX = 0;
+  let startY = 0;
+
+  let touching = false;
+
+  renderer.domElement.addEventListener(
+    "pointerdown",
+    event => {
+
+      touching = true;
+
+      startX = event.clientX;
+      startY = event.clientY;
+
+    }
+  );
+
+  renderer.domElement.addEventListener(
+    "pointermove",
+    event => {
+
+      if (!touching) return;
+
+      const dx =
+        event.clientX - startX;
+
+      const dy =
+        event.clientY - startY;
+
+      targetRotationY =
+        dx * 0.004;
+
+      targetRotationX =
+        dy * 0.004;
+
+    }
+  );
+
+  renderer.domElement.addEventListener(
+    "pointerup",
+    () => {
+
+      touching = false;
+
+    }
+  );
+
+  /* =========================
+     ANIMATION
+     ========================= */
+
+  const clock = new THREE.Clock();
+
+  function animate() {
+
+    requestAnimationFrame(animate);
+
+    const time =
+      clock.getElapsedTime();
+
+    /* Mouvement général */
+
+    fragment.rotation.y =
+      Math.sin(time * 0.35) * 0.08
+      + currentRotationY;
+
+    fragment.rotation.x =
+      Math.sin(time * 0.25) * 0.025
+      + currentRotationX;
+
+    /* L'œil respire légèrement */
+
+    const eyeScale =
+      1 +
+      Math.sin(time * 1.5) * 0.025;
+
+    eye.scale.set(
+      1.45 * eyeScale,
+      0.55 * eyeScale,
+      0.35
+    );
+
+    /* Pupille légèrement animée */
+
+    pupil.position.x =
+      Math.sin(time * 0.8) * 0.08;
+
+    pupil.position.y =
+      Math.sin(time * 0.6) * 0.04;
+
+    /* Lumière vivante */
+
+    light.intensity =
+      30 +
+      Math.sin(time * 2) * 5;
+
+    /* Retour progressif */
+
+    currentRotationX +=
+      (targetRotationX - currentRotationX) * 0.05;
+
+    currentRotationY +=
+      (targetRotationY - currentRotationY) * 0.05;
+
+    renderer.render(
+      scene,
+      camera
+    );
+  }
+
+  animate();
+
+  /* =========================
+     REDIMENSIONNEMENT
+     ========================= */
+
+  window.addEventListener(
+    "resize",
+    () => {
+
+      camera.aspect =
+        window.innerWidth /
+        window.innerHeight;
+
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+      );
+
+    }
+  );
+
+  /* Fin du chargement */
+
+  setTimeout(() => {
+
+    document
+      .getElementById("loading")
+      .classList.add("hidden");
+
+  }, 1200);
+
+</script>
+
 </body>
-</html>
+  </html>
