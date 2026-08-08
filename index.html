@@ -1,126 +1,47 @@
-<!DOCTYPE html>     MOTEUR DU TEMPLE
-     ========================= */
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  const container = document.getElementById("scene");
+  <meta name="theme-color" content="#120d08">
 
-  const scene = new THREE.Scene();
+  <title>Fragment de la Curiosité</title>
 
-  scene.background = new THREE.Color(0x080706);
+  <link rel="stylesheet" href="style.css">
+</head>
 
-  /* Caméra */
+<body>
 
-  const camera = new THREE.PerspectiveCamera(
-    45,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    100
-  );
+  <div id="loading">
+    <div class="loading-symbol">✦</div>
+    <p>OUVERTURE DES ARCHIVES...</p>
+  </div>
 
-  camera.position.set(0, 0, 7);
+  <main id="app">
 
-  /* Rendu */
+    <div id="scene"></div>
 
-  const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    alpha: false
-  });
+    <div class="hud">
+      <div class="eyebrow">
+        LES ARCHIVES DU CODEX
+      </div>
 
-  renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio, 2)
-  );
+      <h1>
+        FRAGMENT DE LA CURIOSITÉ
+      </h1>
 
-  renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
-  );
+      <p>
+        Fais glisser ton doigt pour observer · Pince pour zoomer
+      </p>
+    </div>
 
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  </main>
 
-  container.appendChild(renderer.domElement);
+  <script type="module" src="app.js"></script>
 
-  /* Lumières */
-
-  const ambientLight = new THREE.AmbientLight(
-    0xffdca0,
-    1.8
-  );
-
-  scene.add(ambientLight);
-
-  const light = new THREE.PointLight(
-    0xffc56b,
-    35,
-    20
-  );
-
-  light.position.set(0, 2, 4);
-
-  scene.add(light);
-
-  /* =========================
-     FRAGMENT
-     ========================= */
-
-  const fragment = new THREE.Group();
-
-  scene.add(fragment);
-
-  /* Cercle extérieur */
-
-  const ringGeometry =
-    new THREE.TorusGeometry(
-      2.15,
-      0.08,
-      24,
-      96
-    );
-
-  const goldMaterial =
-    new THREE.MeshStandardMaterial({
-      color: 0x9a6b2f,
-      metalness: 0.8,
-      roughness: 0.35
-    });
-
-  const ring =
-    new THREE.Mesh(
-      ringGeometry,
-      goldMaterial
-    );
-
-  fragment.add(ring);
-
-  /* Cercle intérieur */
-
-  const innerGeometry =
-    new THREE.TorusGeometry(
-      1.75,
-      0.035,
-      20,
-      96
-    );
-
-  const innerRing =
-    new THREE.Mesh(
-      innerGeometry,
-      goldMaterial
-    );
-
-  fragment.add(innerRing);
-
-  /* Œil */
-
-  const eyeGeometry =
-    new THREE.SphereGeometry(
-      0.75,
-      48,
-      32
-    );
-
-  const eyeMaterial =
-    new THREE.MeshStandardMaterial({
-      color: 0xc7a56b,
-      roughness: 0.5,
+</body>
+</html>      roughness: 0.5,
       metalness: 0.15
     });
 
