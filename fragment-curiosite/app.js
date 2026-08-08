@@ -1,13 +1,18 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+     import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";
 
 /* =========================================================
    TEMPLE DES GARDIENS
    Fragment de la Curiosité
-   Moteur 3D / 2,5D
+   Moteur 2,5D / 3D
    ========================================================= */
 
 const container = document.getElementById("scene");
-const loading = document.getElementById("loading");
+
+if (!container) {
+  console.error("Erreur : élément #scene introuvable.");
+  throw new Error("Element #scene introuvable");
+}
 
 /* ---------------------------------------------------------
    SCÈNE
@@ -15,7 +20,7 @@ const loading = document.getElementById("loading");
 
 const scene = new THREE.Scene();
 
-scene.background = new THREE.Color(0x090705);
+scene.background = new THREE.Color(0x080604);
 
 /* ---------------------------------------------------------
    CAMÉRA
@@ -28,7 +33,7 @@ const camera = new THREE.PerspectiveCamera(
   100
 );
 
-camera.position.set(0, 0, 5);
+camera.position.set(0, 0, 7);
 
 /* ---------------------------------------------------------
    RENDERER
@@ -36,8 +41,7 @@ camera.position.set(0, 0, 5);
 
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
-  alpha: false,
-  powerPreference: "high-performance"
+  alpha: false
 });
 
 renderer.setPixelRatio(
@@ -54,683 +58,355 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 container.appendChild(renderer.domElement);
 
 /* ---------------------------------------------------------
+   CONTRÔLES TACTILES
+--------------------------------------------------------- */
+
+const controls = new OrbitControls(
+  camera,
+  renderer.domElement
+);
+
+controls.enableDamping = true;
+
+controls.enablePan = false;
+
+controls.minDistance = 4.5;
+controls.maxDistance = 9;
+
+controls.minPolarAngle = Math.PI * 0.25;
+controls.maxPolarAngle = Math.PI * 0.75;
+
+/* ---------------------------------------------------------
    LUMIÈRES
 --------------------------------------------------------- */
 
 const ambientLight = new THREE.AmbientLight(
-  0xffd28a,
-  1.4
+  0xffd9a0,
+  1.8
 );
 
 scene.add(ambientLight);
 
-const mainLight = new THREE.DirectionalLight(
-  0xffb347,
-  2.2
+const mainLight = new THREE.PointLight(
+  0xffa62b,
+  3,
+  15
 );
 
-mainLight.position.set(2, 3, 5);
+mainLight.position.set(
+  2,
+  3,
+  5
+);
 
 scene.add(mainLight);
 
+const secondaryLight = new THREE.PointLight(
+  0xff6b18,
+  1.5,
+  12
+);
+
+secondaryLight.position.set(
+  -3,
+  -2,
+  3
+);
+
+scene.add(secondaryLight);
+
 /* ---------------------------------------------------------
-   GROUPE PRINCIPAL
+   GROUPE DU FRAGMENT
 --------------------------------------------------------- */
 
-const fragmentGroup = new THREE.Group();
+const fragment = new THREE.Group();
 
-scene.add(fragmentGroup);
+scene.add(fragment);
 
 /* ---------------------------------------------------------
-   IMAGE DU FRAGMENT
+   TEXTURE DU FRAGMENT
 --------------------------------------------------------- */
-
-const imagePaths = [
-  "fragment-curiosite/assets/fragment-curiosite.png",
-  "assets/fragment-curiosite.png"
-];
 
 const textureLoader = new THREE.TextureLoader();
 
-let fragmentTexture = null;
+const texture = textureLoader.load(
+  "assets/fragment-curiosite.png",
+  () => {
 
-function loadTexture(index = 0) {
+    texture.colorSpace = THREE.SRGBColorSpace;
 
-  return new Promise((resolve, reject) => {
-
-    if (index >= imagePaths.length) {
-      reject(new Error("Image du fragment introuvable."));
-      return;
-    }
-
-    textureLoader.load(
-      imagePaths[index],
-
-      texture => {
-
-        texture.colorSpace = THREE.SRGBColorSpace;
-
-        resolve(texture);
-      },
-
-      undefined,
-
-      () => {
-
-        loadTexture(index + 1)
-          .then(resolve)
-          .catch(reject);
-
-      }
+    console.log(
+      "Fragment de la Curiosité chargé."
     );
 
+    const loading = document.getElementById("loading");
+
+    if (loading) {
+      loading.classList.add("hidden");
+    }
+  },
+
+  undefined,
+
+  (error) => {
+
+    console.error(
+      "Impossible de charger fragment-curiosite.png",
+      error
+    );
+
+    const loading = document.getElementById("loading");
+
+    if (loading) {
+      loading.textContent =
+        "Impossible de charger le fragment.";
+    }
+  }
+);
+
+/* ---------------------------------------------------------
+   PARCHEMIN 3D
+--------------------------------------------------------- */
+
+const parchmentGeometry =
+  new THREE.BoxGeometry(
+    5.8,
+    7.2,
+    0.16
+  );
+
+const parchmentMaterial =
+  new THREE.MeshStandardMaterial({
+
+    map: texture,
+
+    roughness: 0.72,
+
+    metalness: 0.08
   });
 
-}
-
-/* ---------------------------------------------------------
-   CRÉATION DU FRAGMENT
---------------------------------------------------------- */
-
-async function createFragment() {
-
-  try {
-
-    fragmentTexture = await loadTexture();
-
-    const image = fragmentTexture.image;
-
-    const imageRatio =
-      image.width / image.height;
-
-    const height = 4.7;
-
-    const width = height * imageRatio;
-
-    /* ---------------------------------------------
-       PLAQUE PRINCIPALE
-    --------------------------------------------- */
-
-    const geometry =
-      new THREE.PlaneGeometry(
-        width,
-        height,
-        40,
-        40
-      );
-
-    const material =
-      new THREE.MeshStandardMaterial({
-        map: fragmentTexture,
-        roughness: 0.72,
-        metalness: 0.08
-      });
-
-    const fragment =
-      new THREE.Mesh(
-        geometry,
-        material
-      );
-
-    fragmentGroup.add(fragment);
-
-    /* ---------------------------------------------
-       ÉPAISSEUR DU PAPIER
-    --------------------------------------------- */
-
-    const backGeometry =
-      new THREE.PlaneGeometry(
-        width * 0.985,
-        height * 0.985
-      );
-
-    const backMaterial =
-      new THREE.MeshStandardMaterial({
-        color: 0x4b2c12,
-        roughness: 1
-      });
-
-    const back =
-      new THREE.Mesh(
-        backGeometry,
-        backMaterial
-      );
-
-    back.position.z = -0.045;
-
-    fragmentGroup.add(back);
-
-    /* ---------------------------------------------
-       LUMIÈRE DU FRAGMENT
-    --------------------------------------------- */
-
-    const glowGeometry =
-      new THREE.CircleGeometry(
-        1.8,
-        64
-      );
-
-    const glowMaterial =
-      new THREE.MeshBasicMaterial({
-        color: 0xff9d27,
-        transparent: true,
-        opacity: 0.045,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
-      });
-
-    const glow =
-      new THREE.Mesh(
-        glowGeometry,
-        glowMaterial
-      );
-
-    glow.position.z = 0.04;
-
-    fragmentGroup.add(glow);
-
-    /* ---------------------------------------------
-       OEIL 3D
-       Petit élément animé placé au centre
-    --------------------------------------------- */
-
-    createEye();
-
-    /* ---------------------------------------------
-       POSITION INITIALE
-    --------------------------------------------- */
-
-    fragmentGroup.rotation.x = 0;
-    fragmentGroup.rotation.y = 0;
-
-    fitFragment();
-
-    /* ---------------------------------------------
-       FIN DU CHARGEMENT
-    --------------------------------------------- */
-
-    setTimeout(() => {
-
-      loading.classList.add("hidden");
-
-    }, 700);
-
-  }
-
-  catch (error) {
-
-    console.error(error);
-
-    loading.innerHTML = `
-      <div class="loading-symbol">⚠</div>
-      <p>FRAGMENT INTROUVABLE</p>
-    `;
-
-  }
-
-}
-
-/* ---------------------------------------------------------
-   ŒIL
---------------------------------------------------------- */
-
-let eyeGroup;
-let pupil;
-let iris;
-
-function createEye() {
-
-  eyeGroup = new THREE.Group();
-
-  /*
-     Position approximative de l'œil sur
-     l'illustration du fragment.
-  */
-
-  eyeGroup.position.set(
-    0,
-    0.62,
-    0.075
+const parchment =
+  new THREE.Mesh(
+    parchmentGeometry,
+    parchmentMaterial
   );
 
-  fragmentGroup.add(eyeGroup);
+fragment.add(parchment);
 
-  /* ---------------------------------------------
-     IRIS
-  --------------------------------------------- */
+/* ---------------------------------------------------------
+   CADRE DORÉ
+--------------------------------------------------------- */
 
-  const irisGeometry =
-    new THREE.CircleGeometry(
-      0.19,
-      48
+const frameMaterial =
+  new THREE.MeshStandardMaterial({
+
+    color: 0x9b5517,
+
+    roughness: 0.35,
+
+    metalness: 0.7
+  });
+
+const frameDepth = 0.22;
+
+function createFrame(
+  width,
+  height,
+  x,
+  y
+) {
+
+  const geometry =
+    new THREE.BoxGeometry(
+      width,
+      height,
+      frameDepth
     );
 
-  const irisMaterial =
-    new THREE.MeshStandardMaterial({
-      color: 0x9a5b20,
-      roughness: 0.35,
-      metalness: 0.15
-    });
-
-  iris =
+  const mesh =
     new THREE.Mesh(
-      irisGeometry,
-      irisMaterial
+      geometry,
+      frameMaterial
     );
 
-  iris.position.z = 0.02;
-
-  eyeGroup.add(iris);
-
-  /* ---------------------------------------------
-     PUPILLE
-  --------------------------------------------- */
-
-  const pupilGeometry =
-    new THREE.CircleGeometry(
-      0.075,
-      32
-    );
-
-  const pupilMaterial =
-    new THREE.MeshBasicMaterial({
-      color: 0x050302
-    });
-
-  pupil =
-    new THREE.Mesh(
-      pupilGeometry,
-      pupilMaterial
-    );
-
-  pupil.position.z = 0.035;
-
-  eyeGroup.add(pupil);
-
-  /* ---------------------------------------------
-     REFLET
-  --------------------------------------------- */
-
-  const reflectionGeometry =
-    new THREE.CircleGeometry(
-      0.025,
-      24
-    );
-
-  const reflectionMaterial =
-    new THREE.MeshBasicMaterial({
-      color: 0xffe6a0
-    });
-
-  const reflection =
-    new THREE.Mesh(
-      reflectionGeometry,
-      reflectionMaterial
-    );
-
-  reflection.position.set(
-    -0.035,
-    0.045,
-    0.05
+  mesh.position.set(
+    x,
+    y,
+    0.12
   );
 
-  eyeGroup.add(reflection);
+  fragment.add(mesh);
 
+  return mesh;
 }
 
-/* ---------------------------------------------------------
-   MOUVEMENT DE L'ŒIL
---------------------------------------------------------- */
+/* cadre extérieur */
 
-let targetEyeX = 0;
-let targetEyeY = 0;
-
-function animateEye(time) {
-
-  if (!pupil || !iris) return;
-
-  const slowX =
-    Math.sin(time * 0.0007) * 0.035;
-
-  const slowY =
-    Math.sin(time * 0.0009) * 0.018;
-
-  pupil.position.x +=
-    ((targetEyeX + slowX) - pupil.position.x) * 0.04;
-
-  pupil.position.y +=
-    ((targetEyeY + slowY) - pupil.position.y) * 0.04;
-
-  iris.position.x +=
-    ((targetEyeX * 0.35) - iris.position.x) * 0.035;
-
-  iris.position.y +=
-    ((targetEyeY * 0.35) - iris.position.y) * 0.035;
-
-}
-
-/* ---------------------------------------------------------
-   INTERACTION SOURIS / DOIGT
---------------------------------------------------------- */
-
-let pointerX = 0;
-let pointerY = 0;
-
-let targetRotationX = 0;
-let targetRotationY = 0;
-
-let currentRotationX = 0;
-let currentRotationY = 0;
-
-let zoom = 1;
-let targetZoom = 1;
-
-let dragging = false;
-
-let lastX = 0;
-let lastY = 0;
-
-let pinchDistance = null;
-
-/* ---------------------------------------------------------
-   SOURIS
---------------------------------------------------------- */
-
-renderer.domElement.addEventListener(
-  "pointerdown",
-  event => {
-
-    dragging = true;
-
-    lastX = event.clientX;
-    lastY = event.clientY;
-
-  }
+createFrame(
+  6.0,
+  0.14,
+  0,
+  3.53
 );
 
-renderer.domElement.addEventListener(
-  "pointermove",
-  event => {
-
-    pointerX =
-      (event.clientX / window.innerWidth - 0.5) * 2;
-
-    pointerY =
-      (event.clientY / window.innerHeight - 0.5) * 2;
-
-    targetEyeX =
-      pointerX * 0.11;
-
-    targetEyeY =
-      -pointerY * 0.07;
-
-    if (!dragging) return;
-
-    const dx =
-      event.clientX - lastX;
-
-    const dy =
-      event.clientY - lastY;
-
-    targetRotationY += dx * 0.004;
-    targetRotationX += dy * 0.004;
-
-    targetRotationX =
-      THREE.MathUtils.clamp(
-        targetRotationX,
-        -0.35,
-        0.35
-      );
-
-    targetRotationY =
-      THREE.MathUtils.clamp(
-        targetRotationY,
-        -0.45,
-        0.45
-      );
-
-    lastX = event.clientX;
-    lastY = event.clientY;
-
-  }
+createFrame(
+  6.0,
+  0.14,
+  0,
+  -3.53
 );
 
-renderer.domElement.addEventListener(
-  "pointerup",
-  () => {
-
-    dragging = false;
-
-  }
+createFrame(
+  0.14,
+  7.0,
+  -2.93,
+  0
 );
 
-renderer.domElement.addEventListener(
-  "pointercancel",
-  () => {
-
-    dragging = false;
-
-  }
+createFrame(
+  0.14,
+  7.0,
+  2.93,
+  0
 );
 
 /* ---------------------------------------------------------
-   TACTILE
+   HALO LUMINEUX
 --------------------------------------------------------- */
 
-renderer.domElement.addEventListener(
-  "touchstart",
-  event => {
-
-    if (event.touches.length === 2) {
-
-      pinchDistance =
-        getTouchDistance(event.touches);
-
-    }
-
-  },
-  { passive: true }
-);
-
-renderer.domElement.addEventListener(
-  "touchmove",
-  event => {
-
-    if (event.touches.length !== 2) return;
-
-    const distance =
-      getTouchDistance(event.touches);
-
-    if (pinchDistance !== null) {
-
-      const difference =
-        distance - pinchDistance;
-
-      targetZoom += difference * 0.003;
-
-      targetZoom =
-        THREE.MathUtils.clamp(
-          targetZoom,
-          0.75,
-          1.45
-        );
-
-    }
-
-    pinchDistance = distance;
-
-  },
-  { passive: true }
-);
-
-renderer.domElement.addEventListener(
-  "touchend",
-  () => {
-
-    pinchDistance = null;
-
-  },
-  { passive: true }
-);
-
-/* ---------------------------------------------------------
-   DISTANCE ENTRE DEUX DOIGTS
---------------------------------------------------------- */
-
-function getTouchDistance(touches) {
-
-  const dx =
-    touches[0].clientX -
-    touches[1].clientX;
-
-  const dy =
-    touches[0].clientY -
-    touches[1].clientY;
-
-  return Math.sqrt(
-    dx * dx + dy * dy
+const haloGeometry =
+  new THREE.RingGeometry(
+    2.0,
+    2.08,
+    96
   );
 
-}
+const haloMaterial =
+  new THREE.MeshBasicMaterial({
+
+    color: 0xff9b25,
+
+    transparent: true,
+
+    opacity: 0.45,
+
+    side: THREE.DoubleSide
+  });
+
+const halo =
+  new THREE.Mesh(
+    haloGeometry,
+    haloMaterial
+  );
+
+halo.position.z = 0.25;
+
+fragment.add(halo);
 
 /* ---------------------------------------------------------
-   ADAPTATION DE L'ÉCRAN
+   LUMIÈRE DU FRAGMENT
 --------------------------------------------------------- */
 
-function fitFragment() {
+const fragmentLight =
+  new THREE.PointLight(
+    0xffa12a,
+    1.8,
+    5
+  );
 
-  if (!fragmentTexture) return;
-
-  const image =
-    fragmentTexture.image;
-
-  const imageRatio =
-    image.width / image.height;
-
-  const screenRatio =
-    window.innerWidth /
-    window.innerHeight;
-
-  if (screenRatio < imageRatio) {
-
-    camera.position.z = 5.4;
-
-  } else {
-
-    camera.position.z = 4.7;
-
-  }
-
-}
-
-/* ---------------------------------------------------------
-   RESIZE
---------------------------------------------------------- */
-
-window.addEventListener(
-  "resize",
-  () => {
-
-    camera.aspect =
-      window.innerWidth /
-      window.innerHeight;
-
-    camera.updateProjectionMatrix();
-
-    renderer.setSize(
-      window.innerWidth,
-      window.innerHeight
-    );
-
-    fitFragment();
-
-  }
+fragmentLight.position.set(
+  0,
+  0,
+  1
 );
+
+fragment.add(fragmentLight);
 
 /* ---------------------------------------------------------
    ANIMATION
 --------------------------------------------------------- */
 
-const clock =
-  new THREE.Clock();
+const clock = new THREE.Clock();
 
-function animate(time) {
+function animate() {
 
   requestAnimationFrame(animate);
 
   const elapsed =
     clock.getElapsedTime();
 
-  /* ---------------------------------------------
-     Mouvements doux automatiques
-  --------------------------------------------- */
+  /*
+   * Très légère respiration du fragment.
+   */
 
-  if (!dragging) {
+  fragment.rotation.y =
+    Math.sin(elapsed * 0.35) * 0.035;
 
-    targetRotationY =
-      Math.sin(elapsed * 0.35) * 0.045;
+  fragment.rotation.x =
+    Math.sin(elapsed * 0.25) * 0.018;
 
-    targetRotationX =
-      Math.sin(elapsed * 0.27) * 0.025;
+  /*
+   * Le halo respire doucement.
+   */
 
-  }
+  const haloScale =
+    1 +
+    Math.sin(elapsed * 1.4) * 0.025;
 
-  /* ---------------------------------------------
-     Lissage de la rotation
-  --------------------------------------------- */
-
-  currentRotationX +=
-    (targetRotationX - currentRotationX) * 0.035;
-
-  currentRotationY +=
-    (targetRotationY - currentRotationY) * 0.035;
-
-  fragmentGroup.rotation.x =
-    currentRotationX;
-
-  fragmentGroup.rotation.y =
-    currentRotationY;
-
-  /* ---------------------------------------------
-     Zoom
-  --------------------------------------------- */
-
-  zoom +=
-    (targetZoom - zoom) * 0.08;
-
-  fragmentGroup.scale.set(
-    zoom,
-    zoom,
-    zoom
+  halo.scale.set(
+    haloScale,
+    haloScale,
+    haloScale
   );
 
-  /* ---------------------------------------------
-     Petit flottement 3D
-  --------------------------------------------- */
+  /*
+   * Intensité lumineuse légèrement variable.
+   */
 
-  fragmentGroup.position.y =
-    Math.sin(elapsed * 0.65) * 0.025;
+  fragmentLight.intensity =
+    1.6 +
+    Math.sin(elapsed * 1.8) * 0.25;
 
-  /* ---------------------------------------------
-     Animation de l'œil
-  --------------------------------------------- */
-
-  animateEye(time);
+  controls.update();
 
   renderer.render(
     scene,
     camera
   );
-
 }
+
+/* ---------------------------------------------------------
+   ADAPTATION À L'ÉCRAN
+--------------------------------------------------------- */
+
+function resize() {
+
+  const width =
+    window.innerWidth;
+
+  const height =
+    window.innerHeight;
+
+  camera.aspect =
+    width / height;
+
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(
+    width,
+    height
+  );
+}
+
+window.addEventListener(
+  "resize",
+  resize
+);
 
 /* ---------------------------------------------------------
    DÉMARRAGE
 --------------------------------------------------------- */
 
-createFragment()
-  .then(() => {
+resize();
 
-    animate();
-
-  });
+animate();
