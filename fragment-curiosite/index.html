@@ -1,51 +1,41 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  >
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
 
-  <meta name="theme-color" content="#120d08">
+    <meta name="theme-color" content="#080604">
 
-  <title>Fragment de la Curiosité</title>
+    <title>Fragment de la Curiosité</title>
 
-  <link rel="stylesheet" href="style.css">
-
-  <!--
-    IMPORTMAP
-    Permet à app.js d'utiliser :
-    import * as THREE from "three";
-  -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
-    }
-  }
-  </script>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <!-- Écran de chargement -->
-  <div id="loading">
-    <div class="loading-symbol">✦</div>
-    <div class="loading-text">
-      OUVERTURE DES ARCHIVES...
+    <!-- ÉCRAN DE CHARGEMENT -->
+    <div id="loading">
+        <div class="loading-symbol">✦</div>
+        <div class="loading-text">
+            OUVERTURE DES ARCHIVES...
+        </div>
     </div>
-  </div>
 
-  <!-- Scène 3D -->
-  <div id="scene"></div>
+    <!-- SCÈNE 3D -->
+    <div id="scene"></div>
 
-  <!--
-    APPLICATION
-    Charge app.js en tant que module JavaScript
-  -->
-  <script type="module" src="app.js"></script>
+    <!-- MESSAGE D'ERREUR -->
+    <div id="error-message"></div>
+
+    <!-- THREE.JS -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+    <!-- NOTRE APPLICATION -->
+    <script src="app.js"></script>
 
 </body>
 </html>
