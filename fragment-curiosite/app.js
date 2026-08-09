@@ -1,460 +1,537 @@
- import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
-
 /*
 =========================================================
  TEMPLE DES GARDIENS
- Fragment de la Curiosité
- Version mobile robuste
+ FRAGMENT DE LA CURIOSITÉ
+ VERSION SIMPLE ET ROBUSTE
 =========================================================
 */
 
-const loading = document.getElementById("loading");
-const container = document.getElementById("scene");
+(function () {
 
-if (!container) {
-    throw new Error("L'élément #scene est introuvable.");
-}
+    "use strict";
 
-/* =====================================================
-   SCÈNE
-===================================================== */
+    console.log("APP.JS : démarrage");
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x080604);
+    const loading =
+        document.getElementById("loading");
 
-/* =====================================================
-   CAMÉRA
-===================================================== */
+    const container =
+        document.getElementById("scene");
 
-const camera = new THREE.PerspectiveCamera(
-    45,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    100
-);
+    const errorMessage =
+        document.getElementById("error-message");
 
-camera.position.set(0, 0, 5);
 
-/* =====================================================
-   RENDERER
-===================================================== */
+    /* =================================================
+       VÉRIFICATIONS
+    ================================================= */
 
-const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    alpha: false
-});
+    if (!container) {
+        console.error("ERREUR : #scene introuvable");
+        return;
+    }
 
-renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio || 1, 2)
-);
+    if (typeof THREE === "undefined") {
 
-renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
-);
-
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-
-container.innerHTML = "";
-container.appendChild(renderer.domElement);
-
-/* =====================================================
-   LUMIÈRES
-===================================================== */
-
-const ambientLight = new THREE.AmbientLight(
-    0xffffff,
-    1.5
-);
-
-scene.add(ambientLight);
-
-/* =====================================================
-   GROUPE PRINCIPAL
-===================================================== */
-
-const group = new THREE.Group();
-scene.add(group);
-
-/* =====================================================
-   IMAGE DU FRAGMENT
-===================================================== */
-
-const textureLoader = new THREE.TextureLoader();
-
-const imageTexture = textureLoader.load(
-    "assets/fragment-curiosite.png",
-
-    () => {
-        console.log("Image du fragment chargée.");
-
-        // L'image est chargée :
-        // on peut maintenant retirer l'écran de chargement.
-        hideLoading();
-    },
-
-    undefined,
-
-    (error) => {
         console.error(
-            "Impossible de charger fragment-curiosite.png",
+            "ERREUR : Three.js n'est pas chargé"
+        );
+
+        showError(
+            "Impossible de charger le moteur 3D."
+        );
+
+        return;
+    }
+
+
+    console.log("Three.js chargé");
+
+
+    /* =================================================
+       SCÈNE
+    ================================================= */
+
+    const scene =
+        new THREE.Scene();
+
+    scene.background =
+        new THREE.Color(0x080604);
+
+
+    /* =================================================
+       CAMÉRA
+    ================================================= */
+
+    const camera =
+        new THREE.PerspectiveCamera(
+            45,
+            window.innerWidth /
+            window.innerHeight,
+            0.1,
+            100
+        );
+
+    camera.position.z = 5;
+
+
+    /* =================================================
+       RENDERER
+    ================================================= */
+
+    let renderer;
+
+    try {
+
+        renderer =
+            new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: false
+            });
+
+    } catch (error) {
+
+        console.error(
+            "WebGL indisponible",
             error
         );
 
-        hideLoading();
-
-        showMessage(
-            "Le fragment n'a pas pu être chargé."
+        showError(
+            "WebGL n'est pas disponible sur cet appareil."
         );
+
+        return;
     }
-);
 
-imageTexture.colorSpace = THREE.SRGBColorSpace;
 
-/* =====================================================
-   PLAN IMAGE
-===================================================== */
-
-const geometry = new THREE.PlaneGeometry(
-    4.2,
-    4.2
-);
-
-const material = new THREE.MeshBasicMaterial({
-    map: imageTexture,
-    transparent: true
-});
-
-const fragment = new THREE.Mesh(
-    geometry,
-    material
-);
-
-group.add(fragment);
-
-/* =====================================================
-   CADRE DORÉ
-===================================================== */
-
-const frameGeometry =
-    new THREE.RingGeometry(
-        2.12,
-        2.20,
-        96
+    renderer.setPixelRatio(
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        )
     );
-
-const frameMaterial =
-    new THREE.MeshBasicMaterial({
-        color: 0xb8893b,
-        transparent: true,
-        opacity: 0.9,
-        side: THREE.DoubleSide
-    });
-
-const frame =
-    new THREE.Mesh(
-        frameGeometry,
-        frameMaterial
-    );
-
-frame.position.z = 0.02;
-
-group.add(frame);
-
-/* =====================================================
-   DEUXIÈME CERCLE
-===================================================== */
-
-const innerGeometry =
-    new THREE.RingGeometry(
-        1.98,
-        2.01,
-        96
-    );
-
-const innerMaterial =
-    new THREE.MeshBasicMaterial({
-        color: 0xd8ae63,
-        transparent: true,
-        opacity: 0.45,
-        side: THREE.DoubleSide
-    });
-
-const innerFrame =
-    new THREE.Mesh(
-        innerGeometry,
-        innerMaterial
-    );
-
-innerFrame.position.z = 0.03;
-
-group.add(innerFrame);
-
-/* =====================================================
-   ÉTOILE CENTRALE
-===================================================== */
-
-const starShape = new THREE.Shape();
-
-const points = 8;
-const outerRadius = 0.14;
-const innerRadius = 0.055;
-
-for (let i = 0; i < points * 2; i++) {
-
-    const radius =
-        i % 2 === 0
-            ? outerRadius
-            : innerRadius;
-
-    const angle =
-        (i / (points * 2)) *
-        Math.PI * 2;
-
-    const x =
-        Math.cos(angle) * radius;
-
-    const y =
-        Math.sin(angle) * radius;
-
-    if (i === 0) {
-        starShape.moveTo(x, y);
-    } else {
-        starShape.lineTo(x, y);
-    }
-}
-
-starShape.closePath();
-
-const starGeometry =
-    new THREE.ShapeGeometry(starShape);
-
-const starMaterial =
-    new THREE.MeshBasicMaterial({
-        color: 0xe1bb70,
-        transparent: true,
-        opacity: 0.9,
-        side: THREE.DoubleSide
-    });
-
-const star =
-    new THREE.Mesh(
-        starGeometry,
-        starMaterial
-    );
-
-star.position.set(
-    0,
-    1.82,
-    0.05
-);
-
-group.add(star);
-
-/* =====================================================
-   INTERACTION TACTILE
-===================================================== */
-
-let targetRotationX = 0;
-let targetRotationY = 0;
-
-let startX = 0;
-let startY = 0;
-let dragging = false;
-
-renderer.domElement.addEventListener(
-    "pointerdown",
-    (event) => {
-
-        dragging = true;
-
-        startX = event.clientX;
-        startY = event.clientY;
-
-        renderer.domElement.setPointerCapture(
-            event.pointerId
-        );
-    }
-);
-
-renderer.domElement.addEventListener(
-    "pointermove",
-    (event) => {
-
-        if (!dragging) return;
-
-        const dx =
-            event.clientX - startX;
-
-        const dy =
-            event.clientY - startY;
-
-        targetRotationY += dx * 0.003;
-        targetRotationX += dy * 0.003;
-
-        targetRotationX =
-            Math.max(
-                -0.5,
-                Math.min(
-                    0.5,
-                    targetRotationX
-                )
-            );
-
-        startX = event.clientX;
-        startY = event.clientY;
-    }
-);
-
-renderer.domElement.addEventListener(
-    "pointerup",
-    () => {
-        dragging = false;
-    }
-);
-
-renderer.domElement.addEventListener(
-    "pointercancel",
-    () => {
-        dragging = false;
-    }
-);
-
-/* =====================================================
-   REDIMENSIONNEMENT
-===================================================== */
-
-window.addEventListener(
-    "resize",
-    resize
-);
-
-function resize() {
-
-    camera.aspect =
-        window.innerWidth /
-        window.innerHeight;
-
-    camera.updateProjectionMatrix();
 
     renderer.setSize(
         window.innerWidth,
         window.innerHeight
     );
-}
 
-/* =====================================================
-   ÉCRAN DE CHARGEMENT
-===================================================== */
+    container.innerHTML = "";
 
-function hideLoading() {
+    container.appendChild(
+        renderer.domElement
+    );
 
-    if (!loading) return;
 
-    loading.style.opacity = "0";
+    /* =================================================
+       LUMIÈRE
+    ================================================= */
 
-    setTimeout(() => {
+    const light =
+        new THREE.AmbientLight(
+            0xffffff,
+            1.5
+        );
 
-        loading.style.display = "none";
+    scene.add(light);
 
-    }, 700);
-}
 
-/* =====================================================
-   MESSAGE D'ERREUR
-===================================================== */
+    /* =================================================
+       GROUPE
+    ================================================= */
 
-function showMessage(message) {
+    const group =
+        new THREE.Group();
 
-    const box =
-        document.createElement("div");
+    scene.add(group);
 
-    box.textContent = message;
 
-    box.style.position = "fixed";
-    box.style.left = "50%";
-    box.style.top = "50%";
-    box.style.transform =
-        "translate(-50%, -50%)";
+    /* =================================================
+       CHARGEMENT DE L'IMAGE
+    ================================================= */
 
-    box.style.zIndex = "9999";
+    const loader =
+        new THREE.TextureLoader();
 
-    box.style.padding = "20px";
+    console.log(
+        "Chargement de l'image..."
+    );
 
-    box.style.background =
-        "rgba(20,10,5,0.95)";
 
-    box.style.color = "#e8c98a";
+    loader.load(
 
-    box.style.fontFamily =
-        "Georgia, serif";
+        "assets/fragment-curiosite.png",
 
-    box.style.textAlign = "center";
+        function (texture) {
 
-    box.style.border =
-        "1px solid #8b6837";
+            console.log(
+                "IMAGE CHARGÉE !"
+            );
 
-    box.style.borderRadius =
-        "10px";
+            texture.colorSpace =
+                THREE.SRGBColorSpace;
 
-    document.body.appendChild(box);
-}
 
-/* =====================================================
-   ANIMATION
-===================================================== */
+            /* =========================================
+               IMAGE
+            ========================================= */
 
-const clock =
-    new THREE.Clock();
+            const geometry =
+                new THREE.PlaneGeometry(
+                    4.2,
+                    4.2
+                );
 
-function animate() {
 
-    requestAnimationFrame(animate);
+            const material =
+                new THREE.MeshBasicMaterial({
+                    map: texture,
+                    transparent: true
+                });
 
-    const elapsed =
-        clock.getElapsedTime();
 
-    /*
-      Mouvement très léger lorsqu'on
-      ne touche pas l'écran.
-    */
+            const image =
+                new THREE.Mesh(
+                    geometry,
+                    material
+                );
 
-    if (!dragging) {
 
-        targetRotationY =
-            Math.sin(elapsed * 0.25) *
-            0.08;
+            group.add(image);
 
-        targetRotationX =
-            Math.cos(elapsed * 0.2) *
-            0.025;
+
+            /* =========================================
+               CADRE
+            ========================================= */
+
+            const frameGeometry =
+                new THREE.RingGeometry(
+                    2.12,
+                    2.20,
+                    96
+                );
+
+
+            const frameMaterial =
+                new THREE.MeshBasicMaterial({
+                    color: 0xb8893b,
+                    transparent: true,
+                    opacity: 0.9,
+                    side: THREE.DoubleSide
+                });
+
+
+            const frame =
+                new THREE.Mesh(
+                    frameGeometry,
+                    frameMaterial
+                );
+
+
+            frame.position.z = 0.02;
+
+            group.add(frame);
+
+
+            /* =========================================
+               CERCLE INTÉRIEUR
+            ========================================= */
+
+            const innerGeometry =
+                new THREE.RingGeometry(
+                    1.98,
+                    2.01,
+                    96
+                );
+
+
+            const innerMaterial =
+                new THREE.MeshBasicMaterial({
+                    color: 0xd8ae63,
+                    transparent: true,
+                    opacity: 0.5,
+                    side: THREE.DoubleSide
+                });
+
+
+            const inner =
+                new THREE.Mesh(
+                    innerGeometry,
+                    innerMaterial
+                );
+
+
+            inner.position.z = 0.03;
+
+            group.add(inner);
+
+
+            /* =========================================
+               FIN DU CHARGEMENT
+            ========================================= */
+
+            setTimeout(
+                hideLoading,
+                400
+            );
+
+        },
+
+        undefined,
+
+        function (error) {
+
+            console.error(
+                "ERREUR IMAGE :",
+                error
+            );
+
+            showError(
+                "Impossible de charger le fragment."
+            );
+
+        }
+    );
+
+
+    /* =================================================
+       INTERACTION
+    ================================================= */
+
+    let dragging = false;
+
+    let lastX = 0;
+    let lastY = 0;
+
+    let rotationX = 0;
+    let rotationY = 0;
+
+
+    renderer.domElement.addEventListener(
+        "pointerdown",
+        function (event) {
+
+            dragging = true;
+
+            lastX = event.clientX;
+            lastY = event.clientY;
+
+        }
+    );
+
+
+    renderer.domElement.addEventListener(
+        "pointermove",
+        function (event) {
+
+            if (!dragging) return;
+
+            const dx =
+                event.clientX - lastX;
+
+            const dy =
+                event.clientY - lastY;
+
+            rotationY += dx * 0.004;
+
+            rotationX += dy * 0.004;
+
+            rotationX =
+                Math.max(
+                    -0.5,
+                    Math.min(
+                        0.5,
+                        rotationX
+                    )
+                );
+
+            lastX = event.clientX;
+            lastY = event.clientY;
+
+        }
+    );
+
+
+    renderer.domElement.addEventListener(
+        "pointerup",
+        function () {
+
+            dragging = false;
+
+        }
+    );
+
+
+    renderer.domElement.addEventListener(
+        "pointercancel",
+        function () {
+
+            dragging = false;
+
+        }
+    );
+
+
+    /* =================================================
+       REDIMENSIONNEMENT
+    ================================================= */
+
+    window.addEventListener(
+        "resize",
+        function () {
+
+            camera.aspect =
+                window.innerWidth /
+                window.innerHeight;
+
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(
+                window.innerWidth,
+                window.innerHeight
+            );
+
+        }
+    );
+
+
+    /* =================================================
+       ANIMATION
+    ================================================= */
+
+    const clock =
+        new THREE.Clock();
+
+
+    function animate() {
+
+        requestAnimationFrame(
+            animate
+        );
+
+
+        const time =
+            clock.getElapsedTime();
+
+
+        if (!dragging) {
+
+            rotationY =
+                Math.sin(
+                    time * 0.25
+                ) * 0.08;
+
+            rotationX =
+                Math.cos(
+                    time * 0.2
+                ) * 0.025;
+
+        }
+
+
+        group.rotation.y +=
+            (
+                rotationY -
+                group.rotation.y
+            ) * 0.06;
+
+
+        group.rotation.x +=
+            (
+                rotationX -
+                group.rotation.x
+            ) * 0.06;
+
+
+        renderer.render(
+            scene,
+            camera
+        );
+
     }
 
-    group.rotation.y +=
-        (targetRotationY -
-            group.rotation.y) *
-        0.06;
 
-    group.rotation.x +=
-        (targetRotationX -
-            group.rotation.x) *
-        0.06;
+    animate();
 
-    star.rotation.z =
-        elapsed * 0.15;
 
-    renderer.render(
-        scene,
-        camera
+    /* =================================================
+       FONCTIONS
+    ================================================= */
+
+    function hideLoading() {
+
+        if (!loading) return;
+
+        loading.classList.add(
+            "loading-hidden"
+        );
+
+        setTimeout(
+            function () {
+
+                loading.style.display =
+                    "none";
+
+            },
+            800
+        );
+
+    }
+
+
+    function showError(message) {
+
+        console.error(message);
+
+        if (loading) {
+
+            loading.style.display =
+                "none";
+
+        }
+
+        if (errorMessage) {
+
+            errorMessage.textContent =
+                message;
+
+            errorMessage.style.display =
+                "block";
+
+        }
+
+    }
+
+
+    /* =================================================
+       TEST AUTOMATIQUE
+    ================================================= */
+
+    setTimeout(
+        function () {
+
+            if (
+                loading &&
+                loading.style.display !== "none"
+            ) {
+
+                console.warn(
+                    "Le chargement prend trop de temps."
+                );
+
+                /*
+                  On ne laisse plus jamais
+                  l'utilisateur bloqué
+                  indéfiniment.
+                */
+
+                hideLoading();
+
+            }
+
+        },
+        10000
     );
-}
 
-animate();
 
-/* =====================================================
-   FIN D'INITIALISATION
-===================================================== */
-
-console.log(
-    "Temple des Gardiens : moteur chargé."
-);
+})();
