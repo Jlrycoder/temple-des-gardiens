@@ -1,6 +1,5 @@
-      <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
-
 <head>
   <meta charset="UTF-8">
 
@@ -9,74 +8,44 @@
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
   >
 
-  <meta
-    name="theme-color"
-    content="#080604"
-  >
+  <meta name="theme-color" content="#120d08">
 
   <title>Fragment de la Curiosité</title>
 
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
+  <link rel="stylesheet" href="style.css">
+
+  <!--
+    IMPORTMAP
+    Permet à app.js d'utiliser :
+    import * as THREE from "three";
+  -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+    }
+  }
+  </script>
 </head>
 
 <body>
 
   <!-- Écran de chargement -->
   <div id="loading">
-
     <div class="loading-symbol">✦</div>
-
-    <div class="loading-title">
-      LES ARCHIVES DU CODEX
-    </div>
-
     <div class="loading-text">
-      Révélation du Fragment...
+      OUVERTURE DES ARCHIVES...
     </div>
-
   </div>
 
-
-  <!-- Scène Three.js -->
+  <!-- Scène 3D -->
   <div id="scene"></div>
 
-
-  <!-- Interface -->
-  <div id="interface">
-
-    <header>
-
-      <div class="eyebrow">
-        LES ARCHIVES DU CODEX
-      </div>
-
-      <h1>
-        FRAGMENT DE LA
-        <br>
-        <span>CURIOSITÉ</span>
-      </h1>
-
-    </header>
-
-
-    <div class="instruction">
-      Fais glisser ton doigt pour observer
-      <span>•</span>
-      Pince pour zoomer
-    </div>
-
-  </div>
-
-
-  <!-- Moteur Three.js -->
-  <script
-    type="module"
-    src="app.js"
-  ></script>
+  <!--
+    APPLICATION
+    Charge app.js en tant que module JavaScript
+  -->
+  <script type="module" src="app.js"></script>
 
 </body>
-
 </html>
