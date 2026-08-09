@@ -3,46 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Fragment de la Curiosité</title>
-
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <!-- Écran de chargement -->
-  <div id="loading">
-    <div class="loading-symbol">✦</div>
-    <div class="loading-text">OUVERTURE DES ARCHIVES...</div>
+  <div id="message">
+    <div class="symbol">✦</div>
+    <h1>FRAGMENT DE LA CURIOSITÉ</h1>
+    <p>Le fragment est ouvert.</p>
+
+    <img
+      src="assets/fragment-curiosite.png"
+      alt="Fragment de la Curiosité"
+    >
   </div>
 
-  <!-- Interface principale -->
-  <main id="app">
-
-    <div id="scene"></div>
-
-    <div id="interface">
-
-      <div class="title">
-        FRAGMENT DE LA<br>
-        <span> CURIOSITÉ</span>
-      </div>
-
-      <p class="subtitle">
-        Une mémoire oubliée...
-      </p>
-
-      <button id="startButton">
-        ENTRER DANS LE FRAGMENT
-      </button>
-
-    </div>
-
-  </main>
-
-  <!-- Three.js + notre programme -->
-  <script type="module" src="app.js"></script>
+  <script src="app.js"></script>
 
 </body>
 </html>
