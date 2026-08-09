@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Fragment de la Sagesse</title>
 
   <style>
@@ -10,42 +12,41 @@
       box-sizing: border-box;
     }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
-      min-height: 100%;
       background: #080604;
     }
 
     body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      min-height: 100vh;
       color: #e7c477;
       font-family: Georgia, "Times New Roman", serif;
       text-align: center;
-      padding: 35px 15px 50px;
+      padding: 30px 15px 50px;
     }
 
     h1 {
-      font-size: 42px;
-      letter-spacing: 5px;
-      margin: 20px 0 15px;
+      font-size: clamp(30px, 8vw, 55px);
+      letter-spacing: 4px;
       text-transform: uppercase;
+      margin: 25px 0 15px;
     }
 
     p {
-      font-size: 22px;
+      font-size: clamp(20px, 5vw, 30px);
       letter-spacing: 2px;
       margin: 0 0 30px;
     }
 
-    img {
+    .fragment {
       display: block;
-      width: min(92vw, 700px);
+      width: min(92vw, 750px);
       height: auto;
+      margin: 0 auto;
       border: 5px solid #d8b56a;
-      box-shadow: 0 0 30px rgba(216, 181, 106, 0.25);
+      box-shadow: 0 0 35px rgba(216, 181, 106, 0.25);
     }
   </style>
 </head>
@@ -57,9 +58,10 @@
   <p>Le fragment est ouvert.</p>
 
   <img
-    src="https://raw.githubusercontent.com/Jlrycoder/temple-des-gardiens/main/fragment-sagesse/assets/fragment-sagesse.png"
-    alt="Fragment de la Sagesse"
-  >
+    class="fragment"
+    src="fragment-sagesse.png"
+    alt="Fragment de la Sagesse">
 
 </body>
+
 </html>
