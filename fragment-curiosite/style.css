@@ -6,7 +6,6 @@ html,
 body {
     margin: 0;
     padding: 0;
-    width: 100%;
     min-height: 100%;
 }
 
@@ -20,75 +19,39 @@ body {
 main {
     width: 100%;
     max-width: 900px;
-    margin: 0 auto;
-    padding: 60px 20px 80px;
+    margin: auto;
+    padding: 45px 15px 70px;
+}
+
+.symbole {
+    font-size: 55px;
+    margin-bottom: 25px;
 }
 
 h1 {
-    margin: 20px 0 30px;
-    font-size: clamp(34px, 8vw, 72px);
-    line-height: 1.05;
-    letter-spacing: 5px;
-    text-transform: uppercase;
+    margin: 0 0 35px;
+    font-size: clamp(32px, 8vw, 65px);
+    line-height: 1.15;
+    letter-spacing: 4px;
 }
 
 p {
-    font-size: clamp(20px, 5vw, 32px);
+    font-size: clamp(20px, 5vw, 30px);
     letter-spacing: 3px;
-    margin: 0 0 45px;
+    margin: 0 0 35px;
 }
 
 .fragment {
     width: 100%;
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 8px;
+    margin: auto;
+    padding: 6px;
     border: 3px solid #d9b565;
     background: #120c08;
-    box-shadow:
-        0 0 25px rgba(218, 178, 90, 0.25),
-        0 20px 50px rgba(0, 0, 0, 0.7);
-
-    transform:
-        perspective(1000px)
-        rotateX(0deg)
-        rotateY(0deg);
-
-    transition:
-        transform 0.15s ease-out,
-        box-shadow 0.3s ease;
+    box-shadow: 0 0 30px rgba(218, 178, 90, 0.25);
 }
 
 .fragment img {
     display: block;
     width: 100%;
     height: auto;
-}
-
-.fragment:active {
-    transform:
-        perspective(1000px)
-        rotateX(3deg)
-        rotateY(-3deg)
-        scale(1.01);
-}
-
-@media (max-width: 600px) {
-
-    main {
-        padding: 40px 14px 60px;
-    }
-
-    h1 {
-        letter-spacing: 3px;
-    }
-
-    p {
-        margin-bottom: 30px;
-    }
-
-    .fragment {
-        padding: 5px;
-        border-width: 2px;
-    }
 }
