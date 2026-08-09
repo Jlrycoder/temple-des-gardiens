@@ -1,412 +1,460 @@
-     import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
-import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";
+ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
 
-/* =========================================================
-   TEMPLE DES GARDIENS
-   Fragment de la Curiosité
-   Moteur 2,5D / 3D
-   ========================================================= */
+/*
+=========================================================
+ TEMPLE DES GARDIENS
+ Fragment de la Curiosité
+ Version mobile robuste
+=========================================================
+*/
 
+const loading = document.getElementById("loading");
 const container = document.getElementById("scene");
 
 if (!container) {
-  console.error("Erreur : élément #scene introuvable.");
-  throw new Error("Element #scene introuvable");
+    throw new Error("L'élément #scene est introuvable.");
 }
 
-/* ---------------------------------------------------------
+/* =====================================================
    SCÈNE
---------------------------------------------------------- */
+===================================================== */
 
 const scene = new THREE.Scene();
-
 scene.background = new THREE.Color(0x080604);
 
-/* ---------------------------------------------------------
+/* =====================================================
    CAMÉRA
---------------------------------------------------------- */
+===================================================== */
 
 const camera = new THREE.PerspectiveCamera(
-  45,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  100
+    45,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    100
 );
 
-camera.position.set(0, 0, 7);
+camera.position.set(0, 0, 5);
 
-/* ---------------------------------------------------------
+/* =====================================================
    RENDERER
---------------------------------------------------------- */
+===================================================== */
 
 const renderer = new THREE.WebGLRenderer({
-  antialias: true,
-  alpha: false
+    antialias: true,
+    alpha: false
 });
 
 renderer.setPixelRatio(
-  Math.min(window.devicePixelRatio, 2)
+    Math.min(window.devicePixelRatio || 1, 2)
 );
 
 renderer.setSize(
-  window.innerWidth,
-  window.innerHeight
+    window.innerWidth,
+    window.innerHeight
 );
 
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
+container.innerHTML = "";
 container.appendChild(renderer.domElement);
 
-/* ---------------------------------------------------------
-   CONTRÔLES TACTILES
---------------------------------------------------------- */
-
-const controls = new OrbitControls(
-  camera,
-  renderer.domElement
-);
-
-controls.enableDamping = true;
-
-controls.enablePan = false;
-
-controls.minDistance = 4.5;
-controls.maxDistance = 9;
-
-controls.minPolarAngle = Math.PI * 0.25;
-controls.maxPolarAngle = Math.PI * 0.75;
-
-/* ---------------------------------------------------------
+/* =====================================================
    LUMIÈRES
---------------------------------------------------------- */
+===================================================== */
 
 const ambientLight = new THREE.AmbientLight(
-  0xffd9a0,
-  1.8
+    0xffffff,
+    1.5
 );
 
 scene.add(ambientLight);
 
-const mainLight = new THREE.PointLight(
-  0xffa62b,
-  3,
-  15
-);
+/* =====================================================
+   GROUPE PRINCIPAL
+===================================================== */
 
-mainLight.position.set(
-  2,
-  3,
-  5
-);
+const group = new THREE.Group();
+scene.add(group);
 
-scene.add(mainLight);
-
-const secondaryLight = new THREE.PointLight(
-  0xff6b18,
-  1.5,
-  12
-);
-
-secondaryLight.position.set(
-  -3,
-  -2,
-  3
-);
-
-scene.add(secondaryLight);
-
-/* ---------------------------------------------------------
-   GROUPE DU FRAGMENT
---------------------------------------------------------- */
-
-const fragment = new THREE.Group();
-
-scene.add(fragment);
-
-/* ---------------------------------------------------------
-   TEXTURE DU FRAGMENT
---------------------------------------------------------- */
+/* =====================================================
+   IMAGE DU FRAGMENT
+===================================================== */
 
 const textureLoader = new THREE.TextureLoader();
 
-const texture = textureLoader.load(
-  "assets/fragment-curiosite.png",
-  () => {
+const imageTexture = textureLoader.load(
+    "assets/fragment-curiosite.png",
 
-    texture.colorSpace = THREE.SRGBColorSpace;
+    () => {
+        console.log("Image du fragment chargée.");
 
-    console.log(
-      "Fragment de la Curiosité chargé."
-    );
+        // L'image est chargée :
+        // on peut maintenant retirer l'écran de chargement.
+        hideLoading();
+    },
 
-    const loading = document.getElementById("loading");
+    undefined,
 
-    if (loading) {
-      loading.classList.add("hidden");
+    (error) => {
+        console.error(
+            "Impossible de charger fragment-curiosite.png",
+            error
+        );
+
+        hideLoading();
+
+        showMessage(
+            "Le fragment n'a pas pu être chargé."
+        );
     }
-  },
-
-  undefined,
-
-  (error) => {
-
-    console.error(
-      "Impossible de charger fragment-curiosite.png",
-      error
-    );
-
-    const loading = document.getElementById("loading");
-
-    if (loading) {
-      loading.textContent =
-        "Impossible de charger le fragment.";
-    }
-  }
 );
 
-/* ---------------------------------------------------------
-   PARCHEMIN 3D
---------------------------------------------------------- */
+imageTexture.colorSpace = THREE.SRGBColorSpace;
 
-const parchmentGeometry =
-  new THREE.BoxGeometry(
-    5.8,
-    7.2,
-    0.16
-  );
+/* =====================================================
+   PLAN IMAGE
+===================================================== */
 
-const parchmentMaterial =
-  new THREE.MeshStandardMaterial({
+const geometry = new THREE.PlaneGeometry(
+    4.2,
+    4.2
+);
 
-    map: texture,
+const material = new THREE.MeshBasicMaterial({
+    map: imageTexture,
+    transparent: true
+});
 
-    roughness: 0.72,
+const fragment = new THREE.Mesh(
+    geometry,
+    material
+);
 
-    metalness: 0.08
-  });
+group.add(fragment);
 
-const parchment =
-  new THREE.Mesh(
-    parchmentGeometry,
-    parchmentMaterial
-  );
-
-fragment.add(parchment);
-
-/* ---------------------------------------------------------
+/* =====================================================
    CADRE DORÉ
---------------------------------------------------------- */
+===================================================== */
+
+const frameGeometry =
+    new THREE.RingGeometry(
+        2.12,
+        2.20,
+        96
+    );
 
 const frameMaterial =
-  new THREE.MeshStandardMaterial({
+    new THREE.MeshBasicMaterial({
+        color: 0xb8893b,
+        transparent: true,
+        opacity: 0.9,
+        side: THREE.DoubleSide
+    });
 
-    color: 0x9b5517,
-
-    roughness: 0.35,
-
-    metalness: 0.7
-  });
-
-const frameDepth = 0.22;
-
-function createFrame(
-  width,
-  height,
-  x,
-  y
-) {
-
-  const geometry =
-    new THREE.BoxGeometry(
-      width,
-      height,
-      frameDepth
-    );
-
-  const mesh =
+const frame =
     new THREE.Mesh(
-      geometry,
-      frameMaterial
+        frameGeometry,
+        frameMaterial
     );
 
-  mesh.position.set(
-    x,
-    y,
-    0.12
-  );
+frame.position.z = 0.02;
 
-  fragment.add(mesh);
+group.add(frame);
 
-  return mesh;
+/* =====================================================
+   DEUXIÈME CERCLE
+===================================================== */
+
+const innerGeometry =
+    new THREE.RingGeometry(
+        1.98,
+        2.01,
+        96
+    );
+
+const innerMaterial =
+    new THREE.MeshBasicMaterial({
+        color: 0xd8ae63,
+        transparent: true,
+        opacity: 0.45,
+        side: THREE.DoubleSide
+    });
+
+const innerFrame =
+    new THREE.Mesh(
+        innerGeometry,
+        innerMaterial
+    );
+
+innerFrame.position.z = 0.03;
+
+group.add(innerFrame);
+
+/* =====================================================
+   ÉTOILE CENTRALE
+===================================================== */
+
+const starShape = new THREE.Shape();
+
+const points = 8;
+const outerRadius = 0.14;
+const innerRadius = 0.055;
+
+for (let i = 0; i < points * 2; i++) {
+
+    const radius =
+        i % 2 === 0
+            ? outerRadius
+            : innerRadius;
+
+    const angle =
+        (i / (points * 2)) *
+        Math.PI * 2;
+
+    const x =
+        Math.cos(angle) * radius;
+
+    const y =
+        Math.sin(angle) * radius;
+
+    if (i === 0) {
+        starShape.moveTo(x, y);
+    } else {
+        starShape.lineTo(x, y);
+    }
 }
 
-/* cadre extérieur */
+starShape.closePath();
 
-createFrame(
-  6.0,
-  0.14,
-  0,
-  3.53
+const starGeometry =
+    new THREE.ShapeGeometry(starShape);
+
+const starMaterial =
+    new THREE.MeshBasicMaterial({
+        color: 0xe1bb70,
+        transparent: true,
+        opacity: 0.9,
+        side: THREE.DoubleSide
+    });
+
+const star =
+    new THREE.Mesh(
+        starGeometry,
+        starMaterial
+    );
+
+star.position.set(
+    0,
+    1.82,
+    0.05
 );
 
-createFrame(
-  6.0,
-  0.14,
-  0,
-  -3.53
+group.add(star);
+
+/* =====================================================
+   INTERACTION TACTILE
+===================================================== */
+
+let targetRotationX = 0;
+let targetRotationY = 0;
+
+let startX = 0;
+let startY = 0;
+let dragging = false;
+
+renderer.domElement.addEventListener(
+    "pointerdown",
+    (event) => {
+
+        dragging = true;
+
+        startX = event.clientX;
+        startY = event.clientY;
+
+        renderer.domElement.setPointerCapture(
+            event.pointerId
+        );
+    }
 );
 
-createFrame(
-  0.14,
-  7.0,
-  -2.93,
-  0
+renderer.domElement.addEventListener(
+    "pointermove",
+    (event) => {
+
+        if (!dragging) return;
+
+        const dx =
+            event.clientX - startX;
+
+        const dy =
+            event.clientY - startY;
+
+        targetRotationY += dx * 0.003;
+        targetRotationX += dy * 0.003;
+
+        targetRotationX =
+            Math.max(
+                -0.5,
+                Math.min(
+                    0.5,
+                    targetRotationX
+                )
+            );
+
+        startX = event.clientX;
+        startY = event.clientY;
+    }
 );
 
-createFrame(
-  0.14,
-  7.0,
-  2.93,
-  0
+renderer.domElement.addEventListener(
+    "pointerup",
+    () => {
+        dragging = false;
+    }
 );
 
-/* ---------------------------------------------------------
-   HALO LUMINEUX
---------------------------------------------------------- */
-
-const haloGeometry =
-  new THREE.RingGeometry(
-    2.0,
-    2.08,
-    96
-  );
-
-const haloMaterial =
-  new THREE.MeshBasicMaterial({
-
-    color: 0xff9b25,
-
-    transparent: true,
-
-    opacity: 0.45,
-
-    side: THREE.DoubleSide
-  });
-
-const halo =
-  new THREE.Mesh(
-    haloGeometry,
-    haloMaterial
-  );
-
-halo.position.z = 0.25;
-
-fragment.add(halo);
-
-/* ---------------------------------------------------------
-   LUMIÈRE DU FRAGMENT
---------------------------------------------------------- */
-
-const fragmentLight =
-  new THREE.PointLight(
-    0xffa12a,
-    1.8,
-    5
-  );
-
-fragmentLight.position.set(
-  0,
-  0,
-  1
+renderer.domElement.addEventListener(
+    "pointercancel",
+    () => {
+        dragging = false;
+    }
 );
 
-fragment.add(fragmentLight);
+/* =====================================================
+   REDIMENSIONNEMENT
+===================================================== */
 
-/* ---------------------------------------------------------
-   ANIMATION
---------------------------------------------------------- */
-
-const clock = new THREE.Clock();
-
-function animate() {
-
-  requestAnimationFrame(animate);
-
-  const elapsed =
-    clock.getElapsedTime();
-
-  /*
-   * Très légère respiration du fragment.
-   */
-
-  fragment.rotation.y =
-    Math.sin(elapsed * 0.35) * 0.035;
-
-  fragment.rotation.x =
-    Math.sin(elapsed * 0.25) * 0.018;
-
-  /*
-   * Le halo respire doucement.
-   */
-
-  const haloScale =
-    1 +
-    Math.sin(elapsed * 1.4) * 0.025;
-
-  halo.scale.set(
-    haloScale,
-    haloScale,
-    haloScale
-  );
-
-  /*
-   * Intensité lumineuse légèrement variable.
-   */
-
-  fragmentLight.intensity =
-    1.6 +
-    Math.sin(elapsed * 1.8) * 0.25;
-
-  controls.update();
-
-  renderer.render(
-    scene,
-    camera
-  );
-}
-
-/* ---------------------------------------------------------
-   ADAPTATION À L'ÉCRAN
---------------------------------------------------------- */
+window.addEventListener(
+    "resize",
+    resize
+);
 
 function resize() {
 
-  const width =
-    window.innerWidth;
+    camera.aspect =
+        window.innerWidth /
+        window.innerHeight;
 
-  const height =
-    window.innerHeight;
+    camera.updateProjectionMatrix();
 
-  camera.aspect =
-    width / height;
-
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(
-    width,
-    height
-  );
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
 }
 
-window.addEventListener(
-  "resize",
-  resize
-);
+/* =====================================================
+   ÉCRAN DE CHARGEMENT
+===================================================== */
 
-/* ---------------------------------------------------------
-   DÉMARRAGE
---------------------------------------------------------- */
+function hideLoading() {
 
-resize();
+    if (!loading) return;
+
+    loading.style.opacity = "0";
+
+    setTimeout(() => {
+
+        loading.style.display = "none";
+
+    }, 700);
+}
+
+/* =====================================================
+   MESSAGE D'ERREUR
+===================================================== */
+
+function showMessage(message) {
+
+    const box =
+        document.createElement("div");
+
+    box.textContent = message;
+
+    box.style.position = "fixed";
+    box.style.left = "50%";
+    box.style.top = "50%";
+    box.style.transform =
+        "translate(-50%, -50%)";
+
+    box.style.zIndex = "9999";
+
+    box.style.padding = "20px";
+
+    box.style.background =
+        "rgba(20,10,5,0.95)";
+
+    box.style.color = "#e8c98a";
+
+    box.style.fontFamily =
+        "Georgia, serif";
+
+    box.style.textAlign = "center";
+
+    box.style.border =
+        "1px solid #8b6837";
+
+    box.style.borderRadius =
+        "10px";
+
+    document.body.appendChild(box);
+}
+
+/* =====================================================
+   ANIMATION
+===================================================== */
+
+const clock =
+    new THREE.Clock();
+
+function animate() {
+
+    requestAnimationFrame(animate);
+
+    const elapsed =
+        clock.getElapsedTime();
+
+    /*
+      Mouvement très léger lorsqu'on
+      ne touche pas l'écran.
+    */
+
+    if (!dragging) {
+
+        targetRotationY =
+            Math.sin(elapsed * 0.25) *
+            0.08;
+
+        targetRotationX =
+            Math.cos(elapsed * 0.2) *
+            0.025;
+    }
+
+    group.rotation.y +=
+        (targetRotationY -
+            group.rotation.y) *
+        0.06;
+
+    group.rotation.x +=
+        (targetRotationX -
+            group.rotation.x) *
+        0.06;
+
+    star.rotation.z =
+        elapsed * 0.15;
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
 
 animate();
+
+/* =====================================================
+   FIN D'INITIALISATION
+===================================================== */
+
+console.log(
+    "Temple des Gardiens : moteur chargé."
+);
