@@ -1,261 +1,201 @@
-/*
-=========================================================
- TEMPLE DES GARDIENS
- FRAGMENT DE LA CURIOSITÉ
- INTERFACE SOMBRE / DORÉE
-=========================================================
-*/
+/* =========================================
+   FRAGMENT DE LA CURIOSITÉ
+   Interface sombre / dorée
+   ========================================= */
 
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html,
 body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-
-    background: #080604;
-    color: #e8c98a;
-
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
-    -webkit-tap-highlight-color: transparent;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #080604;
+  color: #d8b56a;
+  font-family: Georgia, "Times New Roman", serif;
 }
 
-body {
-    touch-action: none;
+/* =========================================
+   CHARGEMENT
+   ========================================= */
+
+#loading {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #080604;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  transition:
+    opacity 1s ease,
+    visibility 1s ease;
 }
 
+#loading.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
 
-/* =====================================================
-   SCÈNE 3D
-===================================================== */
+.loading-symbol {
+  font-size: 64px;
+  margin-bottom: 45px;
+
+  animation:
+    pulse 2s infinite ease-in-out;
+}
+
+.loading-text {
+  font-size: 20px;
+  letter-spacing: 7px;
+  text-align: center;
+  padding: 0 20px;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.4;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+/* =========================================
+   SCÈNE
+   ========================================= */
+
+#app {
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+#app.visible {
+  opacity: 1;
+}
 
 #scene {
-    position: fixed;
-
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    overflow: hidden;
-
-    background: #080604;
+  position: absolute;
+  inset: 0;
 }
 
 #scene canvas {
-    display: block;
-
-    width: 100%;
-    height: 100%;
-
-    touch-action: none;
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
+/* =========================================
+   INTERFACE
+   ========================================= */
 
-/* =====================================================
-   ÉCRAN DE CHARGEMENT
-===================================================== */
+#interface {
+  position: absolute;
+  inset: 0;
 
-#loading {
-    position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
 
-    inset: 0;
+  padding: 40px 25px 60px;
 
-    z-index: 1000;
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: center;
-
-    background: #080604;
-
-    color: #d8ae63;
-
-    transition:
-        opacity 0.8s ease;
+  pointer-events: none;
 }
 
+.title {
+  text-align: center;
 
-/* symbole central */
+  font-size: clamp(24px, 7vw, 42px);
+  letter-spacing: 5px;
+  line-height: 1.4;
 
-.loading-symbol {
-    font-size: 64px;
-
-    line-height: 1;
-
-    margin-bottom: 45px;
-
-    color: #d8ae63;
-
-    animation:
-        archivePulse
-        2s
-        infinite
-        ease-in-out;
+  text-shadow:
+    0 0 15px rgba(216, 181, 106, 0.3);
 }
 
-
-/* texte */
-
-.loading-text {
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
-    font-size: 22px;
-
-    font-weight: normal;
-
-    letter-spacing: 7px;
-
-    line-height: 1.5;
-
-    text-align: center;
-
-    color: #d8ae63;
-
-    text-shadow:
-        0 0 10px rgba(216, 174, 99, 0.15);
+.title span {
+  font-size: 1.25em;
 }
 
+.subtitle {
+  margin-top: 12px;
 
-/* =====================================================
-   DISPARITION DU CHARGEMENT
-===================================================== */
+  font-size: 16px;
+  font-style: italic;
+  letter-spacing: 2px;
 
-.loading-hidden {
-    opacity: 0;
-
-    pointer-events: none;
+  opacity: 0.75;
 }
 
+#startButton {
+  pointer-events: auto;
 
-/* =====================================================
-   MESSAGE D'ERREUR
-===================================================== */
+  margin-top: 30px;
+  padding: 15px 25px;
 
-#error-message {
-    display: none;
+  border: 1px solid #d8b56a;
+  border-radius: 2px;
 
-    position: fixed;
+  background: rgba(8, 6, 4, 0.65);
+  color: #d8b56a;
 
-    z-index: 2000;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  letter-spacing: 3px;
 
-    left: 20px;
-    right: 20px;
+  cursor: pointer;
 
-    top: 50%;
-
-    transform:
-        translateY(-50%);
-
-    padding: 25px;
-
-    text-align: center;
-
-    background: #160d08;
-
-    border:
-        1px solid #8b6837;
-
-    border-radius: 8px;
-
-    color: #e8c98a;
-
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
-    font-size: 17px;
-
-    line-height: 1.6;
-
-    box-shadow:
-        0 10px 40px
-        rgba(0, 0, 0, 0.6);
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease;
 }
 
-
-/* =====================================================
-   ANIMATION DU SYMBOLE
-===================================================== */
-
-@keyframes archivePulse {
-
-    0% {
-        transform: scale(1);
-
-        opacity: 0.6;
-    }
-
-    50% {
-        transform: scale(1.15);
-
-        opacity: 1;
-    }
-
-    100% {
-        transform: scale(1);
-
-        opacity: 0.6;
-    }
+#startButton:hover {
+  background: #d8b56a;
+  color: #080604;
 }
 
+#startButton:active {
+  transform: scale(0.96);
+}
 
-/* =====================================================
-   VERSION MOBILE
-===================================================== */
+/* =========================================
+   MOBILE
+   ========================================= */
 
 @media (max-width: 600px) {
 
-    .loading-symbol {
-        font-size: 52px;
+  .loading-text {
+    font-size: 15px;
+    letter-spacing: 4px;
+  }
 
-        margin-bottom: 35px;
-    }
+  .loading-symbol {
+    font-size: 52px;
+    margin-bottom: 35px;
+  }
 
-    .loading-text {
-        font-size: 17px;
+  #interface {
+    padding-bottom: 45px;
+  }
 
-        letter-spacing: 5px;
-
-        padding: 0 20px;
-    }
-
-}
-
-
-/* =====================================================
-   PETITS ÉCRANS
-===================================================== */
-
-@media (max-height: 600px) {
-
-    .loading-symbol {
-        font-size: 44px;
-
-        margin-bottom: 25px;
-    }
-
-    .loading-text {
-        font-size: 15px;
-
-        letter-spacing: 4px;
-    }
-
+  .title {
+    letter-spacing: 3px;
+  }
 }
