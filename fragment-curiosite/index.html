@@ -1,41 +1,48 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    >
+  <title>Fragment de la Curiosité</title>
 
-    <meta name="theme-color" content="#080604">
-
-    <title>Fragment de la Curiosité</title>
-
-    <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- ÉCRAN DE CHARGEMENT -->
-    <div id="loading">
-        <div class="loading-symbol">✦</div>
-        <div class="loading-text">
-            OUVERTURE DES ARCHIVES...
-        </div>
-    </div>
+  <!-- Écran de chargement -->
+  <div id="loading">
+    <div class="loading-symbol">✦</div>
+    <div class="loading-text">OUVERTURE DES ARCHIVES...</div>
+  </div>
 
-    <!-- SCÈNE 3D -->
+  <!-- Interface principale -->
+  <main id="app">
+
     <div id="scene"></div>
 
-    <!-- MESSAGE D'ERREUR -->
-    <div id="error-message"></div>
+    <div id="interface">
 
-    <!-- THREE.JS -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+      <div class="title">
+        FRAGMENT DE LA<br>
+        <span> CURIOSITÉ</span>
+      </div>
 
-    <!-- NOTRE APPLICATION -->
-    <script src="app.js"></script>
+      <p class="subtitle">
+        Une mémoire oubliée...
+      </p>
+
+      <button id="startButton">
+        ENTRER DANS LE FRAGMENT
+      </button>
+
+    </div>
+
+  </main>
+
+  <!-- Three.js + notre programme -->
+  <script type="module" src="app.js"></script>
 
 </body>
 </html>
