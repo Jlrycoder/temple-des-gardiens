@@ -1,201 +1,52 @@
-/* =========================================
-   FRAGMENT DE LA CURIOSITÉ
-   Interface sombre / dorée
-   ========================================= */
-
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 html,
 body {
+  margin: 0;
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
   background: #080604;
   color: #d8b56a;
   font-family: Georgia, "Times New Roman", serif;
 }
 
-/* =========================================
-   CHARGEMENT
-   ========================================= */
+body {
+  min-height: 100vh;
+}
 
-#loading {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: #080604;
-
+#message {
+  min-height: 100vh;
+  padding: 40px 20px;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
-  align-items: center;
-
-  transition:
-    opacity 1s ease,
-    visibility 1s ease;
-}
-
-#loading.hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.loading-symbol {
-  font-size: 64px;
-  margin-bottom: 45px;
-
-  animation:
-    pulse 2s infinite ease-in-out;
-}
-
-.loading-text {
-  font-size: 20px;
-  letter-spacing: 7px;
   text-align: center;
-  padding: 0 20px;
 }
 
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(0.8);
-    opacity: 0.4;
-  }
-
-  50% {
-    transform: scale(1.1);
-    opacity: 1;
-  }
+.symbol {
+  font-size: 55px;
+  margin-bottom: 25px;
 }
 
-/* =========================================
-   SCÈNE
-   ========================================= */
-
-#app {
-  position: fixed;
-  inset: 0;
-  opacity: 0;
-  transition: opacity 1.5s ease;
+h1 {
+  font-size: 25px;
+  letter-spacing: 4px;
+  margin: 0 0 15px;
 }
 
-#app.visible {
-  opacity: 1;
-}
-
-#scene {
-  position: absolute;
-  inset: 0;
-}
-
-#scene canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* =========================================
-   INTERFACE
-   ========================================= */
-
-#interface {
-  position: absolute;
-  inset: 0;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
-
-  padding: 40px 25px 60px;
-
-  pointer-events: none;
-}
-
-.title {
-  text-align: center;
-
-  font-size: clamp(24px, 7vw, 42px);
-  letter-spacing: 5px;
-  line-height: 1.4;
-
-  text-shadow:
-    0 0 15px rgba(216, 181, 106, 0.3);
-}
-
-.title span {
-  font-size: 1.25em;
-}
-
-.subtitle {
-  margin-top: 12px;
-
-  font-size: 16px;
-  font-style: italic;
+p {
+  font-size: 17px;
   letter-spacing: 2px;
-
-  opacity: 0.75;
+  margin-bottom: 30px;
 }
 
-#startButton {
-  pointer-events: auto;
-
-  margin-top: 30px;
-  padding: 15px 25px;
-
-  border: 1px solid #d8b56a;
-  border-radius: 2px;
-
-  background: rgba(8, 6, 4, 0.65);
-  color: #d8b56a;
-
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 13px;
-  letter-spacing: 3px;
-
-  cursor: pointer;
-
-  transition:
-    background 0.3s ease,
-    color 0.3s ease,
-    transform 0.3s ease;
-}
-
-#startButton:hover {
-  background: #d8b56a;
-  color: #080604;
-}
-
-#startButton:active {
-  transform: scale(0.96);
-}
-
-/* =========================================
-   MOBILE
-   ========================================= */
-
-@media (max-width: 600px) {
-
-  .loading-text {
-    font-size: 15px;
-    letter-spacing: 4px;
-  }
-
-  .loading-symbol {
-    font-size: 52px;
-    margin-bottom: 35px;
-  }
-
-  #interface {
-    padding-bottom: 45px;
-  }
-
-  .title {
-    letter-spacing: 3px;
-  }
+img {
+  display: block;
+  width: min(90vw, 500px);
+  height: auto;
+  border: 3px solid #d8b56a;
+  box-shadow: 0 0 30px rgba(216, 181, 106, 0.25);
 }
